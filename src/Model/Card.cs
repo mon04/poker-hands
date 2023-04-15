@@ -81,7 +81,7 @@ public class Card : IComparable<Card>
 
         if (suit == null)
         {
-            throw new ArgumentException($"Unable to determine rank from symbol: {encoding[0]}");
+            throw new ArgumentException($"Unable to determine suit from symbol: {encoding[0]}");
         }
 
         return new Card() { Rank = (Rank) rank, Suit = (Suit) suit };
