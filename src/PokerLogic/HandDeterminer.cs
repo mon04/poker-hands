@@ -95,7 +95,7 @@ public static class HandDeterminer
         return false;
     }
 
-    private static void SortByRankDescending(Card[] cards)
+    private static void SortDescending(Card[] cards)
     {
         Array.Sort(cards, (c1, c2) => - c1.CompareTo(c2));
     }
