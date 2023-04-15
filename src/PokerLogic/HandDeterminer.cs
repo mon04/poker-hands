@@ -7,7 +7,7 @@ public static class HandDeterminer
 {
     public static Hand GetHand(Card[] cards)
     {
-        SortByRankDescending(cards);
+        SortDescending(cards);
 
         if (TryFindTwoPair(cards))
         {
