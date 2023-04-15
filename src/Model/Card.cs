@@ -4,13 +4,50 @@ public class Card : IComparable<Card>
 {
     public Rank Rank { get; set; }
     public Suit Suit { get; set; }
+    public string Title { get => $"{Rank} of {Suit}"; }
+    public string Encoding
+    {
+        get
+        {
+            char rankSymbol = Rank switch
+            {
+                Rank.Ace   => 'A',
+                Rank.King  => 'K',
+                Rank.Queen => 'Q',
+                Rank.Jack  => 'J',
+                Rank.Ten   => 'T',
+                Rank.Nine  => '9',
+                Rank.Eight => '8',
+                Rank.Seven => '7',
+                Rank.Six   => '6',
+                Rank.Five  => '5',
+                Rank.Four  => '4',
+                Rank.Three => '3',
+                Rank.Two   => '2'
+            };
 
+            char suitSymbol = Suit switch
+            {
+                Suit.Clubs    => 'c',
+                Suit.Diamonds => 'd',
+                Suit.Hearts   => 'h',
+                Suit.Spades   => 's'
+            };
+
+            return $"{rankSymbol}{suitSymbol}";
+        }
+    }
     public static Card FromEncoding(string encoding)
     {
+        if(encoding == null || encoding.Length != 2)
+        {
+            throw new ArgumentException($"{nameof(encoding)} must have length 2 (a rank symbol followed by a suit symbol)");
+        }
+
         encoding = encoding.ToUpper();
 
-        Rank rank;
-        Suit suit;
+        Rank? rank = null;
+        Suit? suit = null;
 
         rank = encoding[0] switch
         {
@@ -29,6 +66,11 @@ public class Card : IComparable<Card>
             'A' => Rank.Ace
         };
 
+        if(rank == null)
+        {
+            throw new ArgumentException($"Unable to determine rank from symbol: {encoding[0]}");
+        }
+
         suit = encoding[1] switch
         {
             'C' => Suit.Clubs,
@@ -37,7 +79,12 @@ public class Card : IComparable<Card>
             'S' => Suit.Spades
         };
 
-        return new Card() { Rank = rank, Suit = suit };
+        if (suit == null)
+        {
+            throw new ArgumentException($"Unable to determine rank from symbol: {encoding[0]}");
+        }
+
+        return new Card() { Rank = (Rank) rank, Suit = (Suit) suit };
     }
 
     public int CompareTo(Card? other)
