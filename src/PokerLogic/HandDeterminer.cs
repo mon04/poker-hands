@@ -231,6 +231,10 @@ public static class HandDeterminer
 
     private static void SortDescending(Card[] cards)
     {
-        Array.Sort(cards, (c1, c2) => - c1.CompareTo(c2));
+        Array.Sort(cards, (c1, c2) => 
+        {
+            int rankComparison = c1.CompareTo(c2);
+            return rankComparison == 0 ? - c1.Suit.CompareTo(c2.Suit) : - rankComparison;
+        });
     }
 }
