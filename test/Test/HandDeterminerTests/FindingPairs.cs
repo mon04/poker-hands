@@ -16,11 +16,11 @@ internal class FindingPairs
     {
         var cardEncodings = handEncoded.Split(' ');
         var cards = new Card[cardEncodings.Length];
-        for(var i = 0; i < cards.Length; i++)
+        for (var i = 0; i < cards.Length; i++)
         {
             cards[i] = Card.FromEncoding(cardEncodings[i]);
         }
-        Array.Sort(cards, ((c1, c2) => - c1.CompareTo(c2)));
+        Array.Sort(cards, ((c1, c2) => -c1.CompareTo(c2)));
 
         var hand = HandDeterminer.GetHand(cards);
 

@@ -7,14 +7,14 @@ public class Hand : IComparable<Hand>
 
     public int CompareTo(Hand? other)
     {
-        if(other == null)
+        if (other == null)
         {
             throw new ArgumentNullException("other");
         }
 
-        if(this.Class == other.Class)
+        if (this.Class == other.Class)
         {
-            for(var i = 0; i < CompareOrder.Length; i++)
+            for (var i = 0; i < CompareOrder.Length; i++)
             {
                 var thisCard = this.CompareOrder[i];
                 var otherCard = other.CompareOrder[i];

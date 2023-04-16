@@ -1,5 +1,4 @@
 ﻿using Model;
-using System.Linq;
 
 namespace PokerLogic;
 
@@ -67,27 +66,27 @@ public static class HandDeterminer
         int highPairRank = -1;
         int lowPairRank = -1;
 
-        foreach(Card card in cards)
+        foreach (Card card in cards)
         {
-            amtOfRankFound[(int) card.Rank]++;
+            amtOfRankFound[(int)card.Rank]++;
 
-            if (amtOfRankFound[(int) card.Rank] == 2)
+            if (amtOfRankFound[(int)card.Rank] == 2)
             {
-                if(highPairRank == -1)
+                if (highPairRank == -1)
                 {
-                    highPairRank = (int) card.Rank;
+                    highPairRank = (int)card.Rank;
                     continue;
                 }
 
                 lowPairRank = (int)card.Rank;
                 Array.Sort(cards, (c1, c2) =>
                 {
-                    if (c1.Rank == c2.Rank) return - c1.CompareTo(c2);
+                    if (c1.Rank == c2.Rank) return -c1.CompareTo(c2);
                     if ((int)c1.Rank == highPairRank) return -1;
                     if ((int)c2.Rank == highPairRank) return 1;
                     if ((int)c1.Rank == lowPairRank) return -1;
                     if ((int)c2.Rank == lowPairRank) return 1;
-                    return - c1.CompareTo(c2);
+                    return -c1.CompareTo(c2);
                 });
                 return true;
             }
@@ -121,7 +120,7 @@ public static class HandDeterminer
             && cards[3].Rank == Rank.Three
             && cards[4].Rank == Rank.Two)
         {
-            if(sortInCompareOrder)
+            if (sortInCompareOrder)
             {
                 Array.Sort(cards, (c1, c2) =>
                 {
@@ -208,10 +207,10 @@ public static class HandDeterminer
             {
                 Array.Sort(cards, (c1, c2) =>
                 {
-                    if (c1.Rank == c2.Rank) return - c1.CompareTo(c2);
+                    if (c1.Rank == c2.Rank) return -c1.CompareTo(c2);
                     if (c1.Rank == card.Rank) return -1;
                     if (c2.Rank == card.Rank) return 1;
-                    return - c1.CompareTo(c2);
+                    return -c1.CompareTo(c2);
                 });
                 return true;
             }
@@ -231,10 +230,10 @@ public static class HandDeterminer
 
     private static void SortDescending(Card[] cards)
     {
-        Array.Sort(cards, (c1, c2) => 
+        Array.Sort(cards, (c1, c2) =>
         {
             int rankComparison = c1.CompareTo(c2);
-            return rankComparison == 0 ? - c1.Suit.CompareTo(c2.Suit) : - rankComparison;
+            return rankComparison == 0 ? -c1.Suit.CompareTo(c2.Suit) : -rankComparison;
         });
     }
 }

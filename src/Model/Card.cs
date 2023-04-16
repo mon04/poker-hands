@@ -39,7 +39,7 @@ public class Card : IComparable<Card>
     }
     public static Card FromEncoding(string encoding)
     {
-        if(encoding == null || encoding.Length != 2)
+        if (encoding == null || encoding.Length != 2)
         {
             throw new ArgumentException($"{nameof(encoding)} must have length 2 (a rank symbol followed by a suit symbol)");
         }
@@ -66,7 +66,7 @@ public class Card : IComparable<Card>
             'A' => Rank.Ace
         };
 
-        if(rank == null)
+        if (rank == null)
         {
             throw new ArgumentException($"Unable to determine rank from symbol: {encoding[0]}");
         }
@@ -84,12 +84,12 @@ public class Card : IComparable<Card>
             throw new ArgumentException($"Unable to determine suit from symbol: {encoding[0]}");
         }
 
-        return new Card() { Rank = (Rank) rank, Suit = (Suit) suit };
+        return new Card() { Rank = (Rank)rank, Suit = (Suit)suit };
     }
 
     public int CompareTo(Card? other)
     {
-        if(other is null)
+        if (other is null)
         {
             throw new ArgumentNullException(nameof(other));
         }
