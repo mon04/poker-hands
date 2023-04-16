@@ -4,19 +4,19 @@ using PokerLogic;
 namespace Test.HandDeterminerTests;
 
 [TestFixture]
-internal class FindingPairs
+internal class FindingStraights
 {
-    private const string Input1 =  "2h 2c 3d Jc Tc";
-    private const string Input2 =  "Jd As 6s Ah Tc";
-    private const string Input3 =  "As Ks Qs Js Jc";
-    private const string Input4 =  "5c Tc 4h Qh 5d";
-    private const string Input5 =  "As Ks Qs Js Kc";
+    private const string Input1 = "2h 3h 6d 5h 4s";
+    private const string Input2 = "9c 8d 7h 6h 5c";
+    private const string Input3 = "Jc Ts 7c 9d 8c";
+    private const string Input4 = "2c 3d 4h 5c Ad";
+    private const string Input5 = "Ac Qd Kh Js Ts";
 
-    private const string ExpCompareOrder1 = "2h 2c Jc Tc 3d";
-    private const string ExpCompareOrder2 = "As Ah Jd Tc 6s";
-    private const string ExpCompareOrder3 = "Js Jc As Ks Qs";
-    private const string ExpCompareOrder4 = "5d 5c Qh Tc 4h";
-    private const string ExpCompareOrder5 = "Ks Kc As Qs Js";
+    private const string ExpCompareOrder1 = "6d 5h 4s 3h 2h";
+    private const string ExpCompareOrder2 = "9c 8d 7h 6h 5c";
+    private const string ExpCompareOrder3 = "Jc Ts 9d 8c 7c";
+    private const string ExpCompareOrder4 = "5c 4h 3d 2c Ad";
+    private const string ExpCompareOrder5 = "Ac Kh Qd Js Ts";
 
     [Test]
     [TestCase(Input1, ExpCompareOrder1)]
@@ -24,7 +24,7 @@ internal class FindingPairs
     [TestCase(Input3, ExpCompareOrder3)]
     [TestCase(Input4, ExpCompareOrder4)]
     [TestCase(Input5, ExpCompareOrder5)]
-    public void FindPair(string handEncoded, string expCompareOrderEncoded)
+    public void FindStraight(string handEncoded, string expCompareOrderEncoded)
     {
         var cardEncodings = handEncoded.Split(' ');
         var cards = new Card[cardEncodings.Length];
@@ -42,7 +42,7 @@ internal class FindingPairs
         Console.WriteLine(cardsEncoded);
 
         Assert.That(hand, Is.Not.Null);
-        Assert.That(hand.Class, Is.EqualTo(HandClass.Pair));
+        Assert.That(hand.Class, Is.EqualTo(HandClass.Straight));
         Assert.That(Helpers.CardsEncoded(cards), Is.EqualTo(expCompareOrderEncoded));
     }
 }
