@@ -6,21 +6,11 @@ namespace Test.HandDeterminerTests;
 [TestFixture]
 internal class FindingRoyalFlushes
 {
-    private const string Input1 = "As Ks Qs Js Ts";
-    private const string Input2 = "Th Jh Qh Kh Ah";
-    private const string Input3 = "Td Kd Qd Jd Ad";
-    private const string Input4 = "Ac Kc Tc Qc Jc";
-
-    private const string ExpCompareOrder1 = "As Ks Qs Js Ts";
-    private const string ExpCompareOrder2 = "Ah Kh Qh Jh Th";
-    private const string ExpCompareOrder3 = "Ad Kd Qd Jd Td";
-    private const string ExpCompareOrder4 = "Ac Kc Qc Jc Tc";
-
     [Test]
-    [TestCase(Input1, ExpCompareOrder1)]
-    [TestCase(Input2, ExpCompareOrder2)]
-    [TestCase(Input3, ExpCompareOrder3)]
-    [TestCase(Input4, ExpCompareOrder4)]
+    [TestCase("As Ks Qs Js Ts", "As Ks Qs Js Ts")]
+    [TestCase("Th Jh Qh Kh Ah", "Ah Kh Qh Jh Th")]
+    [TestCase("Td Kd Qd Jd Ad", "Ad Kd Qd Jd Td")]
+    [TestCase("Ac Kc Tc Qc Jc", "Ac Kc Qc Jc Tc")]
     public void FindFlush(string handEncoded, string expCompareOrderEncoded)
     {
         var cardEncodings = handEncoded.Split(' ');

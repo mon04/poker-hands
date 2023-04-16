@@ -6,24 +6,12 @@ namespace Test.HandDeterminerTests;
 [TestFixture]
 internal class FindingFourOfAKinds
 {
-    private const string Input1 = "2h 2c 3d 2s 2d";
-    private const string Input2 = "Ad As 6s Ah Ac";
-    private const string Input3 = "Jd Jh Qs Js Jc";
-    private const string Input4 = "5c Tc 5h 5s 5d";
-    private const string Input5 = "As Ks Kd Kh Kc";
-
-    private const string ExpCompareOrder1 = "2s 2h 2d 2c 3d";
-    private const string ExpCompareOrder2 = "As Ah Ad Ac 6s";
-    private const string ExpCompareOrder3 = "Js Jh Jd Jc Qs";
-    private const string ExpCompareOrder4 = "5s 5h 5d 5c Tc";
-    private const string ExpCompareOrder5 = "Ks Kh Kd Kc As";
-
     [Test]
-    [TestCase(Input1, ExpCompareOrder1)]
-    [TestCase(Input2, ExpCompareOrder2)]
-    [TestCase(Input3, ExpCompareOrder3)]
-    [TestCase(Input4, ExpCompareOrder4)]
-    [TestCase(Input5, ExpCompareOrder5)]
+    [TestCase("2h 2c 3d 2s 2d", "2s 2h 2d 2c 3d")]
+    [TestCase("Ad As 6s Ah Ac", "As Ah Ad Ac 6s")]
+    [TestCase("Jd Jh Qs Js Jc", "Js Jh Jd Jc Qs")]
+    [TestCase("5c Tc 5h 5s 5d", "5s 5h 5d 5c Tc")]
+    [TestCase("As Ks Kd Kh Kc", "Ks Kh Kd Kc As")]
     public void FindFourOfAKind(string handEncoded, string expCompareOrderEncoded)
     {
         var cardEncodings = handEncoded.Split(' ');
