@@ -20,7 +20,6 @@ internal class FindingStraights
         {
             cards[i] = Card.FromEncoding(cardEncodings[i]);
         }
-        Array.Sort(cards, ((c1, c2) => -c1.CompareTo(c2)));
 
         var hand = HandDeterminer.GetHand(cards);
 
