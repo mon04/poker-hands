@@ -96,11 +96,6 @@ public class Card : IComparable<Card>
 
         int rankComparison = this.Rank.CompareTo(other.Rank);
 
-        if(rankComparison == 0)
-        {
-            return this.Suit.CompareTo(other.Suit);
-        }
-
         return rankComparison;
     }
 }
