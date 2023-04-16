@@ -6,11 +6,11 @@ namespace Test.HandDeterminerTests;
 [TestFixture]
 internal class FindingPairs
 {
-    private const string Input1 =  "2h 2c 3d Jc Tc";
-    private const string Input2 =  "Jd As 6s Ah Tc";
-    private const string Input3 =  "As Ks Qs Js Jc";
-    private const string Input4 =  "5c Tc 4h Qh 5d";
-    private const string Input5 =  "As Ks Qs Js Kc";
+    private const string Input1 = "2h 2c 3d Jc Tc";
+    private const string Input2 = "Jd As 6s Ah Tc";
+    private const string Input3 = "As Ks Qs Js Jc";
+    private const string Input4 = "5c Tc 4h Qh 5d";
+    private const string Input5 = "As Ks Qs Js Kc";
 
     private const string ExpCompareOrder1 = "2h 2c Jc Tc 3d";
     private const string ExpCompareOrder2 = "As Ah Jd Tc 6s";
