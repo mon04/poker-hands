@@ -21,7 +21,7 @@ internal class FindingTwoPairs
             cards[i] = Card.FromEncoding(cardEncodings[i]);
         }
 
-        var hand = HandDeterminer.GetHand(cards);
+        var hand = HandDeterminer.GetBestHand(cards);
 
         var cardsEncoded = Helpers.CardsEncoded(cards);
 
@@ -30,6 +30,6 @@ internal class FindingTwoPairs
 
         Assert.That(hand, Is.Not.Null);
         Assert.That(hand.Class, Is.EqualTo(HandClass.TwoPair));
-        Assert.That(Helpers.CardsEncoded(cards), Is.EqualTo(expCompareOrderEncoded));
+        Assert.That(Helpers.CardsEncoded(hand.CompareOrder), Is.EqualTo(expCompareOrderEncoded));
     }
 }

@@ -1,10 +1,19 @@
 ﻿namespace Model;
 
-public class Card : IComparable<Card>
+public class Card : IComparable<Card>, IEquatable<Card>
 {
     public Rank Rank { get; set; }
     public Suit Suit { get; set; }
     public string Title { get => $"{Rank} of {Suit}"; }
+
+    public Card(Suit suit, Rank rank)
+    {
+        Suit = suit;
+        Rank = rank;
+    }
+
+    public Card() { }
+
     public string Encoding
     {
         get
@@ -94,8 +103,14 @@ public class Card : IComparable<Card>
             throw new ArgumentNullException(nameof(other));
         }
 
-        int rankComparison = this.Rank.CompareTo(other.Rank);
+        int rankComparison = this.Rank - other.Rank;
 
         return rankComparison;
     }
+
+	public bool Equals(Card? other)
+	{
+        if (this is null && other is not null || this is not null && other is null) return true;
+		return this.Rank == other.Rank && this.Suit == other.Suit;
+	}
 }

@@ -25,8 +25,8 @@ internal class ComparingFlushes
             cards2[i] = Card.FromEncoding(cards2Encoded[i]);
         }
 
-        var hand1 = HandDeterminer.GetHand(cards1);
-        var hand2 = HandDeterminer.GetHand(cards2);
+        var hand1 = HandDeterminer.GetBestHand(cards1);
+        var hand2 = HandDeterminer.GetBestHand(cards2);
 
         Assert.That(hand1.Class, Is.EqualTo(HandClass.Flush));
         Assert.That(hand2.Class, Is.EqualTo(HandClass.Flush));

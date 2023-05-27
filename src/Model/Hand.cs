@@ -9,7 +9,7 @@ public class Hand : IComparable<Hand>
     {
         if (other == null)
         {
-            throw new ArgumentNullException("other");
+            return 1;
         }
 
         if (this.Class == other.Class)
@@ -29,4 +29,9 @@ public class Hand : IComparable<Hand>
 
         return this.Class.CompareTo(other.Class);
     }
+
+	public override string ToString()
+	{
+        return string.Join(", ", CompareOrder.Select(c => c.Encoding));
+	}
 }

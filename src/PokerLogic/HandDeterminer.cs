@@ -4,236 +4,325 @@ namespace PokerLogic;
 
 public static class HandDeterminer
 {
-    public static Hand GetHand(Card[] cards)
-    {
-        HandClass handClass;
+	public static Hand GetBestHand(Card[] cards)
+	{
+		if (cards.Length != 5)
+		{
+			throw new ArgumentException($"{nameof(cards)} must have length 5.");
+		}
 
-        SortDescending(cards);
+		SortDescending(cards);
 
-        if (TryFindRoyalFlush(cards))
-        {
-            handClass = HandClass.RoyalFlush;
-        }
-        else if (TryFindStraightFlush(cards))
-        {
-            handClass = HandClass.StraightFlush;
-        }
-        else if (TryFindFourOfAKind(cards))
-        {
-            handClass = HandClass.FourOfAKind;
-        }
-        else if (TryFindFullHouse(cards))
-        {
-            handClass = HandClass.FullHouse;
-        }
-        else if (TryFindFlush(cards))
-        {
-            handClass = HandClass.Flush;
-        }
-        else if (TryFindStraight(cards, true))
-        {
-            handClass = HandClass.Straight;
-        }
-        else if (TryFindThreeOfAKind(cards))
-        {
-            handClass = HandClass.ThreeOfAKind;
-        }
-        else if (TryFindTwoPair(cards))
-        {
-            handClass = HandClass.TwoPair;
-        }
-        else if (TryFindPair(cards))
-        {
-            handClass = HandClass.Pair;
-        }
-        else
-        {
-            handClass = HandClass.HighCard;
-        }
+		var cardsByRank = GetCardsByRank(cards);
+		var cardsBySuit = GetCardsBySuit(cards);
 
-        return new Hand() { Class = handClass, CompareOrder = cards };
-    }
 
-    private static bool TryFindPair(Card[] cards)
-    {
-        return TryFindDuplicates(cards, 2);
-    }
+		// 01. RoyalFlush
 
-    private static bool TryFindTwoPair(Card[] cards)
-    {
-        var amtOfRankFound = new int[Enum.GetValues(typeof(Rank)).Length];
+		if (TryFindRoyalFlush(cards, cardsBySuit, out var isFlush))
+		{
+			return new Hand() { Class = HandClass.RoyalFlush, CompareOrder = cards };
+		}
 
-        int highPairRank = -1;
-        int lowPairRank = -1;
+		// 02. StraightFlush
 
-        foreach (Card card in cards)
-        {
-            amtOfRankFound[(int)card.Rank]++;
+		if (isFlush && TryFindStraight(cards, out var compareOrder))
+		{
+			return new Hand() { Class = HandClass.StraightFlush, CompareOrder = compareOrder };
+		}
 
-            if (amtOfRankFound[(int)card.Rank] == 2)
-            {
-                if (highPairRank == -1)
-                {
-                    highPairRank = (int)card.Rank;
-                    continue;
-                }
+		// 03. FourOfAKind
 
-                lowPairRank = (int)card.Rank;
-                Array.Sort(cards, (c1, c2) =>
-                {
-                    if (c1.Rank == c2.Rank) return -c1.CompareTo(c2);
-                    if ((int)c1.Rank == highPairRank) return -1;
-                    if ((int)c2.Rank == highPairRank) return 1;
-                    if ((int)c1.Rank == lowPairRank) return -1;
-                    if ((int)c2.Rank == lowPairRank) return 1;
-                    return -c1.CompareTo(c2);
-                });
-                return true;
-            }
-        }
-        return false;
-    }
+		if (TryFindFourOfAKind(cards, cardsByRank, out compareOrder))
+		{
+			return new Hand() { Class = HandClass.FourOfAKind, CompareOrder = compareOrder };
+		}
 
-    private static bool TryFindThreeOfAKind(Card[] cards)
-    {
-        return TryFindDuplicates(cards, 3);
-    }
+		// 04. FullHouse
 
-    private static bool TryFindFlush(Card[] cards)
-    {
-        for (var i = 1; i < cards.Length; i++)
-        {
-            if (cards[i].Suit != cards[i - 1].Suit)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+		if (TryFindFullHouse(cards, cardsByRank, out var threeOfAKindRank, out var pairRank, out compareOrder))
+		{
+			return new Hand() { Class = HandClass.FullHouse, CompareOrder = compareOrder };
+		}
 
-    private static bool TryFindStraight(Card[] cards, bool sortInCompareOrder)
-    {
-        // Check Five-High Straight:
-        if (cards[0].Rank == Rank.Ace
-            && cards[1].Rank == Rank.Five
-            && cards[2].Rank == Rank.Four
-            && cards[3].Rank == Rank.Three
-            && cards[4].Rank == Rank.Two)
-        {
-            if (sortInCompareOrder)
-            {
-                Array.Sort(cards, (c1, c2) =>
-                {
-                    if (c1.Rank == Rank.Ace) return 1;
-                    if (c2.Rank == Rank.Ace) return -1;
-                    return -c1.CompareTo(c2);
-                });
-            }
-            return true;
-        }
+		// 05. Flush
 
-        for (var i = 1; i < cards.Length; i++)
-        {
-            if (cards[i].Rank - cards[i - 1].Rank != -1)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+		if(isFlush)
+		{
+			return new Hand() { Class = HandClass.Flush, CompareOrder = cards };
+		}
 
-    private static bool TryFindFullHouse(Card[] cards)
-    {
-        if (AreEqualInRank(cards[0], cards[1], cards[2])
-            && !AreEqualInRank(cards[2], cards[3])
-            && AreEqualInRank(cards[3], cards[4]))
-        {
-            var tripletRank = cards[0].Rank;
-            Array.Sort(cards, (c1, c2) =>
-            {
-                if (c1.Rank == c2.Rank) return -c1.CompareTo(c2);
-                if (c1.Rank == tripletRank) return -1;
-                if (c2.Rank == tripletRank) return 1;
-                return -c1.CompareTo(c2);
-            });
-            return true;
-        }
+		// 06. Straight
 
-        if (AreEqualInRank(cards[4], cards[3], cards[2])
-            && !AreEqualInRank(cards[2], cards[1])
-            && AreEqualInRank(cards[1], cards[0]))
-        {
-            var tripletRank = cards[4].Rank;
-            Array.Sort(cards, (c1, c2) =>
-            {
-                if (c1.Rank == c2.Rank) return -c1.CompareTo(c2);
-                if (c1.Rank == tripletRank) return -1;
-                if (c2.Rank == tripletRank) return 1;
-                return -c1.CompareTo(c2);
-            });
-            return true;
-        }
+		if (TryFindStraight(cards, out compareOrder))
+		{
+			return new Hand() { Class = HandClass.Straight, CompareOrder = compareOrder };
+		}
 
-        return false;
-    }
+		// 07. ThreeOfAKind
 
-    private static bool TryFindFourOfAKind(Card[] cards)
-    {
-        return TryFindDuplicates(cards, 4);
-    }
+		if (threeOfAKindRank != null)
+		{
+			compareOrder = new Card[cards.Length];
 
-    private static bool TryFindStraightFlush(Card[] cards)
-    {
-        return TryFindFlush(cards) && TryFindStraight(cards, true);
-    }
+			var i = 0;
 
-    private static bool TryFindRoyalFlush(Card[] cards)
-    {
-        return (TryFindFlush(cards)
-            && cards[0].Rank == Rank.Ace
-            && cards[1].Rank == Rank.King
-            && cards[2].Rank == Rank.Queen
-            && cards[3].Rank == Rank.Jack
-            && cards[4].Rank == Rank.Ten);
-    }
+			foreach (Card card in cardsByRank[(Rank)threeOfAKindRank])
+			{
+				compareOrder[i++] = card;
+			}
 
-    private static bool TryFindDuplicates(Card[] cards, int numberOfDupes)
-    {
-        var amtOfRankFound = new int[Enum.GetValues(typeof(Rank)).Length];
+			foreach (Card card in cards)
+			{
+				if (card.Rank != threeOfAKindRank) compareOrder[i++] = card;
+			}
 
-        foreach (Card card in cards)
-        {
-            if (++amtOfRankFound[(int)card.Rank] == numberOfDupes)
-            {
-                Array.Sort(cards, (c1, c2) =>
-                {
-                    if (c1.Rank == c2.Rank) return -c1.CompareTo(c2);
-                    if (c1.Rank == card.Rank) return -1;
-                    if (c2.Rank == card.Rank) return 1;
-                    return -c1.CompareTo(c2);
-                });
-                return true;
-            }
-        }
+			return new Hand() { Class = HandClass.ThreeOfAKind, CompareOrder = compareOrder };
+		}
 
-        return false;
-    }
+		// 08. TwoPair
 
-    private static bool AreEqualInRank(params Card[] cards)
-    {
-        for (var i = 1; i < cards.Length; i++)
-        {
-            if (cards[i].Rank != cards[i - 1].Rank) return false;
-        }
-        return true;
-    }
+		if (TryFindTwoPair(cards, cardsByRank, out compareOrder))
+		{
+			return new Hand() { Class = HandClass.TwoPair, CompareOrder = compareOrder };
+		}
 
-    private static void SortDescending(Card[] cards)
-    {
-        Array.Sort(cards, (c1, c2) =>
-        {
-            int rankComparison = c1.CompareTo(c2);
-            return rankComparison == 0 ? -c1.Suit.CompareTo(c2.Suit) : -rankComparison;
-        });
-    }
+		// 09. Pair
+
+		if (pairRank != null)
+		{
+			compareOrder = new Card[cards.Length];
+
+			var i = 0;
+
+			foreach(Card card in cardsByRank[(Rank)pairRank])
+			{
+				compareOrder[i++] = card;
+			}
+
+			foreach(Card card in cards)
+			{
+				if(card.Rank != pairRank) compareOrder[i++] = card;
+			}
+
+			return new Hand() { Class = HandClass.Pair, CompareOrder = compareOrder };
+		}
+
+		// 10. HighCard
+
+		return new Hand() { Class = HandClass.HighCard, CompareOrder = cards };
+	}
+
+	private static bool TryFindRoyalFlush(Card[] cards, Dictionary<Suit, List<Card>> cardsBySuit,
+		out bool isFlush)
+	{
+		isFlush = false;
+
+		if (!TryFindFlush(cards, cardsBySuit)) return false;
+		else isFlush = true;
+
+		if (cards[0].Rank != Rank.Ace) return false;
+		if (cards[1].Rank != Rank.King) return false;
+		if (cards[2].Rank != Rank.Queen) return false;
+		if (cards[3].Rank != Rank.Jack) return false;
+		if (cards[4].Rank != Rank.Ten) return false;
+
+		return true;
+	}
+
+	private static bool TryFindFourOfAKind(Card[] cards, Dictionary<Rank, List<Card>> cardsByRank,
+		out Card[] compareOrder)
+	{
+		compareOrder = new Card[cards.Length];
+
+		foreach (var rank in cardsByRank.Keys)
+		{
+			if (cardsByRank[rank].Count == 4)
+			{
+				int i = 0;
+				foreach (Card card in cards)
+				{
+					if (card.Rank == rank)
+					{
+						compareOrder[i] = card;
+						i++;
+					}
+				}
+				compareOrder[^1] = cards.First(c => c.Rank != rank);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static bool TryFindFullHouse(Card[] cards, Dictionary<Rank, List<Card>> cardsByRank, out Rank? threeOfAKindRank, out Rank? pairRank, out Card[] compareOrder)
+	{
+		compareOrder = new Card[cards.Length];
+
+		threeOfAKindRank = null;
+		pairRank = null;
+
+		foreach (var rank in cardsByRank.Keys)
+		{ 
+			if (cardsByRank[rank].Count == 3)
+			{
+				threeOfAKindRank = rank;
+				continue;
+			}
+			if (cardsByRank[rank].Count == 2)
+			{
+				pairRank = rank;
+			}
+		}
+
+		if (pairRank == null) return false;
+		if (threeOfAKindRank == null) return false;
+
+		var i = 0;
+
+		foreach(var card in cardsByRank[(Rank)threeOfAKindRank])
+		{
+			compareOrder[i++] = card;
+		}
+
+		foreach (var card in cardsByRank[(Rank)pairRank])
+		{
+			compareOrder[i++] = card;
+		}
+
+		return true;
+	}
+
+	private static bool TryFindFlush(Card[] cards, Dictionary<Suit, List<Card>> cardsBySuit)
+	{
+		foreach (var suit in cardsBySuit.Keys)
+		{
+			if (cardsBySuit[suit].Count == 5)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static bool TryFindStraight(Card[] cards, out Card[] compareOrder)
+	{
+		compareOrder = new Card[cards.Length];
+
+		if (cards[0].Rank == Rank.Ace && cards[1].Rank == Rank.Five)
+		{
+			if (cards[2].Rank != Rank.Four) return false;
+			if (cards[3].Rank != Rank.Three) return false;
+			if (cards[4].Rank != Rank.Two) return false;
+			compareOrder[0] = cards[1]; // Five
+			compareOrder[1] = cards[2]; // Four
+			compareOrder[2] = cards[3]; // Three
+			compareOrder[3] = cards[4]; // Two
+			compareOrder[4] = cards[0]; // Ace
+			return true;
+		}
+		else
+		{
+			for (var i = 1; i < cards.Length; i++)
+			{
+				if(cards[0].CompareTo(cards[i]) != i) return false;
+			}
+		}
+
+		Array.Copy(cards, compareOrder, cards.Length);
+		return true;
+	}
+
+	private static bool TryFindTwoPair(Card[] cards, Dictionary<Rank, List<Card>> cardsByRank, out Card[] compareOrder)
+	{
+		compareOrder = new Card[cards.Length];
+
+		Rank? pairRank1 = null;
+		Rank? pairRank2 = null;
+
+		foreach (var rank in cardsByRank.Keys)
+		{
+			if (cardsByRank[rank].Count == 2)
+			{
+				if(pairRank1 != null)
+				{
+					pairRank2 = rank;
+					break;
+				}
+				pairRank1 = rank;
+			}
+		}
+
+		if (pairRank1 == null || pairRank2 == null) return false;
+
+		Rank higherPairRank = (Rank)(Math.Max((int)pairRank1, (int)pairRank2));
+		Rank lowerPairRank  = (Rank)(Math.Min((int)pairRank1, (int)pairRank2));
+
+		var i = 0;
+
+		foreach (var card in cardsByRank[higherPairRank])
+		{
+			compareOrder[i++] = card;
+		}
+
+		foreach (var card in cardsByRank[lowerPairRank])
+		{
+			compareOrder[i++] = card;
+		}
+
+		// As 'cards' is sorted, the non-pair card is either first, third or fifth
+		if      (cards[0].Rank != higherPairRank && cards[0].Rank != lowerPairRank) compareOrder[4] = cards[0];
+		else if (cards[2].Rank != higherPairRank && cards[2].Rank != lowerPairRank) compareOrder[4] = cards[2];
+		else if (cards[4].Rank != higherPairRank && cards[4].Rank != lowerPairRank) compareOrder[4] = cards[4];
+
+		return true;
+	}
+
+
+	// Helpers
+
+	private static Dictionary<Rank, List<Card>> GetCardsByRank(Card[] cards)
+	{
+		var map = new Dictionary<Rank, List<Card>>();
+
+		foreach (var e in Enum.GetValues(typeof(Rank)))
+		{
+			map.Add((Rank)e, new List<Card>());
+		}
+
+		foreach (Card card in cards)
+		{
+			map[card.Rank].Add(card);
+		}
+
+		return map;
+	}
+
+	private static Dictionary<Suit, List<Card>> GetCardsBySuit(Card[] cards)
+	{
+		var map = new Dictionary<Suit, List<Card>>();
+
+		foreach (var e in Enum.GetValues(typeof(Suit)))
+		{
+			map.Add((Suit)e, new List<Card>());
+		}
+
+		foreach (Card card in cards)
+		{
+			map[card.Suit].Add(card);
+		}
+
+		return map;
+	}
+
+	private static void SortDescending(Card[] cards)
+	{
+		Array.Sort(cards, (c1, c2) =>
+		{
+			int rankComparison = c1.CompareTo(c2);
+			return rankComparison == 0 ? -c1.Suit.CompareTo(c2.Suit) : -rankComparison;
+		});
+	}
 }

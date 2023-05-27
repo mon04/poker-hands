@@ -21,7 +21,7 @@ internal class FindingFourOfAKinds
             cards[i] = Card.FromEncoding(cardEncodings[i]);
         }
 
-        var hand = HandDeterminer.GetHand(cards);
+        var hand = HandDeterminer.GetBestHand(cards);
 
         var cardsEncoded = Helpers.CardsEncoded(cards);
 
@@ -30,6 +30,6 @@ internal class FindingFourOfAKinds
 
         Assert.That(hand, Is.Not.Null);
         Assert.That(hand.Class, Is.EqualTo(HandClass.FourOfAKind));
-        Assert.That(Helpers.CardsEncoded(cards), Is.EqualTo(expCompareOrderEncoded));
+        Assert.That(Helpers.CardsEncoded(hand.CompareOrder), Is.EqualTo(expCompareOrderEncoded));
     }
 }
