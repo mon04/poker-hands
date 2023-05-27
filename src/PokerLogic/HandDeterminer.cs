@@ -6,11 +6,47 @@ public static class HandDeterminer
 {
 	public static Hand GetBestHand(Card[] cards)
 	{
-		if (cards.Length != 5)
+		if (cards.Length != 7)
 		{
-			throw new ArgumentException($"{nameof(cards)} must have length 5.");
+			throw new ArgumentException($"{nameof(cards)} must have length 7.");
 		}
 
+		Hand? bestHand = null;
+
+		for(int i=0; i < cards.Length; i++)
+		{
+			for(var j=i+1; j < cards.Length; j++)
+			{
+				for(int k=j+1; k < cards.Length; k++)
+				{
+					for(int m=k+1; m < cards.Length; m++)
+					{
+						for(int n=m+1; n < cards.Length; n++)
+						{
+							Card[] combination = new Card[5];
+							combination[0] = cards[i];
+							combination[1] = cards[j];
+							combination[2] = cards[k];
+							combination[3] = cards[m];
+							combination[4] = cards[n];
+
+							Hand combinationHand = ClassifyHand(combination);
+
+							if(bestHand is null || combinationHand.CompareTo(bestHand) > 0)
+							{
+								bestHand = combinationHand;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return bestHand;
+	}
+
+	private static Hand ClassifyHand(Card[] cards)
+	{
 		SortDescending(cards);
 
 		var cardsByRank = GetCardsByRank(cards);
@@ -47,7 +83,7 @@ public static class HandDeterminer
 
 		// 05. Flush
 
-		if(isFlush)
+		if (isFlush)
 		{
 			return new Hand() { Class = HandClass.Flush, CompareOrder = cards };
 		}
@@ -95,14 +131,14 @@ public static class HandDeterminer
 
 			var i = 0;
 
-			foreach(Card card in cardsByRank[(Rank)pairRank])
+			foreach (Card card in cardsByRank[(Rank)pairRank])
 			{
 				compareOrder[i++] = card;
 			}
 
-			foreach(Card card in cards)
+			foreach (Card card in cards)
 			{
-				if(card.Rank != pairRank) compareOrder[i++] = card;
+				if (card.Rank != pairRank) compareOrder[i++] = card;
 			}
 
 			return new Hand() { Class = HandClass.Pair, CompareOrder = compareOrder };
