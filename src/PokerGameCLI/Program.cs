@@ -8,9 +8,6 @@ public class Program
 	public static void Main(String[] args)
 	{
 		var deck = DeckLogic.GetDeck();
-		DeckLogic.Shuffle(deck);
-		DeckLogic.Shuffle(deck);
-		DeckLogic.Shuffle(deck);
 		deck = DeckLogic.Shuffle(deck);
 
 		var playersPockets = new Card[5, 2];
